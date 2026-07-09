@@ -2,11 +2,13 @@ package jp.ac.ccmc.form_sample;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/contact")
@@ -27,18 +29,27 @@ public class FormController {
         selectAddress.put("Kanagawa", "神奈川県");
     }
 
-    @GetMapping({"/", "/index"})
+    @GetMapping({ "/", "/index" })
     public String index() {
         return "contact";
     }
-    
+
     @GetMapping("/message")
-    public String showMessageForm() {
+    public String showMessageForm(Model model, @ModelAttribute UserMessage userMessage) {
+        model.addAttribute("radioGender", radioGender);
+        model.addAttribute("selectAddress", selectAddress);
         return "form/message-form";
     }
 
     @PostMapping("/message")
-    public String postMessageForm() {
+    public String postMessageForm(Model model, @ModelAttribute UserMessage userMessage,
+            RedirectAttributes redirectAttributes) {
+        if (userMessage.getBody().isEmpty()) {
+            redirectAttributes.addFlashAttribute("note", "caution");
+            return "redirect:./message";
+        }
+        model.addAttribute("radioGender", radioGender);
+        model.addAttribute("selectAddress", selectAddress);
         return "form/message-result";
     }
 
